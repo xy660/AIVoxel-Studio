@@ -1,0 +1,136 @@
+[gd_scene format=3 uid="uid://c3ysxgi5k7nr8"]
+
+[ext_resource type="Script" uid="uid://cbbqvnhgpig7q" path="res://UI/ChatPanel.cs" id="1_script"]
+[ext_resource type="PackedScene" path="res://UI/ConfirmDialog.tscn" id="2_confirm"]
+[ext_resource type="PackedScene" path="res://UI/HistoryMenu.tscn" id="3_history"]
+[ext_resource type="PackedScene" path="res://UI/SessionContextMenu.tscn" id="4_session"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
+bg_color = Color(0.06, 0.07, 0.09, 0.92)
+border_width_left = 1
+border_color = Color(1, 1, 1, 0.12)
+
+[node name="ChatPanel" type="CanvasLayer" unique_id=1452935094]
+layer = 5
+script = ExtResource("1_script")
+
+[node name="ChatRoot" type="Control" parent="." unique_id=672574658]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ChatPanel" type="PanelContainer" parent="ChatRoot" unique_id=756494566]
+visible = false
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -420.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="Main" type="VBoxContainer" parent="ChatRoot/ChatPanel" unique_id=2029658833]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Header" type="HBoxContainer" parent="ChatRoot/ChatPanel/Main" unique_id=2085710411]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="ChatRoot/ChatPanel/Main/Header" unique_id=1858912616]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "AI 建造助手"
+
+[node name="Spacer" type="Control" parent="ChatRoot/ChatPanel/Main/Header" unique_id=442159825]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HistoryButton" type="Button" parent="ChatRoot/ChatPanel/Main/Header" unique_id=1705562018]
+layout_mode = 2
+focus_mode = 0
+text = "对话"
+
+[node name="NewChatButton" type="Button" parent="ChatRoot/ChatPanel/Main/Header" unique_id=2077536929]
+layout_mode = 2
+focus_mode = 0
+text = "新建"
+
+[node name="SettingsButton" type="Button" parent="ChatRoot/ChatPanel/Main/Header" unique_id=156211171]
+layout_mode = 2
+focus_mode = 0
+text = "设置"
+
+[node name="CloseButton" type="Button" parent="ChatRoot/ChatPanel/Main/Header" unique_id=1064376768]
+layout_mode = 2
+focus_mode = 0
+text = "关闭"
+
+[node name="Scroll" type="ScrollContainer" parent="ChatRoot/ChatPanel/Main" unique_id=1831289697]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Messages" type="VBoxContainer" parent="ChatRoot/ChatPanel/Main/Scroll" unique_id=715412886]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="PendingImages" type="HBoxContainer" parent="ChatRoot/ChatPanel/Main"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="InputRow" type="HBoxContainer" parent="ChatRoot/ChatPanel/Main" unique_id=47363902]
+layout_mode = 2
+
+[node name="ImageButton" type="Button" parent="ChatRoot/ChatPanel/Main/InputRow"]
+layout_mode = 2
+focus_mode = 0
+text = "图片"
+
+[node name="Input" type="LineEdit" parent="ChatRoot/ChatPanel/Main/InputRow" unique_id=1396240310]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "描述你想建造的内容，Enter 发送"
+
+[node name="SendButton" type="Button" parent="ChatRoot/ChatPanel/Main/InputRow" unique_id=855041183]
+layout_mode = 2
+focus_mode = 0
+text = "发送"
+
+[node name="Status" type="Label" parent="ChatRoot/ChatPanel/Main" unique_id=1158726344]
+modulate = Color(1, 1, 1, 0.6)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+
+[node name="ImageDialog" type="FileDialog" parent="ChatRoot"]
+title = "选择图片"
+size = Vector2i(760, 500)
+file_mode = 1
+access = 2
+filters = PackedStringArray("*.png, *.jpg, *.jpeg, *.webp ; 图片")
+
+[node name="ConfirmDialog" parent="." instance=ExtResource("2_confirm")]
+
+[node name="HistoryMenu" parent="ChatRoot/ChatPanel/Main" instance=ExtResource("3_history")]
+
+[node name="SessionContextMenu" parent="ChatRoot/ChatPanel/Main" instance=ExtResource("4_session")]
+
+[connection signal="pressed" from="ChatRoot/ChatPanel/Main/Header/HistoryButton" to="." method="ShowHistoryMenu"]
+[connection signal="pressed" from="ChatRoot/ChatPanel/Main/Header/NewChatButton" to="." method="NewSession"]
+[connection signal="pressed" from="ChatRoot/ChatPanel/Main/Header/SettingsButton" to="." method="OpenSettingsPanel"]
+[connection signal="pressed" from="ChatRoot/ChatPanel/Main/Header/CloseButton" to="." method="Close"]
+[connection signal="pressed" from="ChatRoot/ChatPanel/Main/InputRow/ImageButton" to="." method="OpenImageDialog"]
+[connection signal="pressed" from="ChatRoot/ChatPanel/Main/InputRow/SendButton" to="." method="OnSendPressed"]
+[connection signal="confirmed" from="ConfirmDialog" to="." method="DeletePendingSession"]
+[connection signal="canceled" from="ConfirmDialog" to="." method="OnConfirmCanceled"]

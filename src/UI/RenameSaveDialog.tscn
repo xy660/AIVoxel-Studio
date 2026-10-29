@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://dwgfwcyyrc743"]
+
+[node name="RenameSaveDialog" type="ConfirmationDialog" unique_id=1627235442]
+oversampling_override = 1.0
+title = "重命名方案"
+size = Vector2i(376, 119)
+ok_button_text = "确定"
+cancel_button_text = "取消"
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=1747490094]
+custom_minimum_size = Vector2(360, 0)
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 368.0
+offset_bottom = 70.0
+
+[node name="Box" type="VBoxContainer" parent="Margin" unique_id=2127543689]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Hint" type="Label" parent="Margin/Box" unique_id=1579483741]
+layout_mode = 2
+text = "新的方案名称"
+
+[node name="NameInput" type="LineEdit" parent="Margin/Box" unique_id=1026701809]
+layout_mode = 2
+placeholder_text = "方案名称"

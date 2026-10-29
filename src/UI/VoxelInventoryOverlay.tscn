@@ -1,0 +1,80 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://UI/BlockInventoryOverlay.tscn" id="1_base"]
+[ext_resource type="Script" path="res://UI/VoxelInventoryOverlay.cs" id="2_script"]
+
+[node name="VoxelInventoryOverlay" instance=ExtResource("1_base")]
+script = ExtResource("2_script")
+
+[node name="CatalogLabel" type="Label" parent="Root/Center/Panel/Box/Body"]
+layout_mode = 2
+text = "标准色（点击放入当前选中的快捷格）"
+
+[node name="Grid" type="GridContainer" parent="Root/Center/Panel/Box/Body"]
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+columns = 3
+
+[node name="Catalog1" type="Button" parent="Root/Center/Panel/Box/Body/Grid"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+text = "草绿"
+
+[node name="Catalog2" type="Button" parent="Root/Center/Panel/Box/Body/Grid"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+text = "石灰"
+
+[node name="Catalog3" type="Button" parent="Root/Center/Panel/Box/Body/Grid"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+text = "红色"
+
+[node name="Catalog4" type="Button" parent="Root/Center/Panel/Box/Body/Grid"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+text = "橙色"
+
+[node name="Catalog5" type="Button" parent="Root/Center/Panel/Box/Body/Grid"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+text = "黄色"
+
+[node name="Catalog6" type="Button" parent="Root/Center/Panel/Box/Body/Grid"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+text = "蓝色"
+
+[node name="Catalog7" type="Button" parent="Root/Center/Panel/Box/Body/Grid"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+text = "紫色"
+
+[node name="Catalog8" type="Button" parent="Root/Center/Panel/Box/Body/Grid"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+text = "白色"
+
+[node name="Catalog9" type="Button" parent="Root/Center/Panel/Box/Body/Grid"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+text = "空气墙"

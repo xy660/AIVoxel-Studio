@@ -1,0 +1,10 @@
+[gd_scene format=3]
+
+[node name="SaveContextMenu" type="PopupMenu"]
+item_count = 3
+item_0/text = "打开"
+item_0/id = 0
+item_1/text = "重命名"
+item_1/id = 1
+item_2/text = "删除"
+item_2/id = 2

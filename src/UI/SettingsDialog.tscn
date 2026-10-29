@@ -1,0 +1,183 @@
+[gd_scene format=3 uid="uid://b5wt0ps8yn5h8"]
+
+[ext_resource type="Script" uid="uid://6pya8qm36fe3" path="res://UI/SettingsDialog.cs" id="1_settings"]
+
+[node name="SettingsDialog" type="Window" unique_id=1956432666]
+oversampling_override = 1.0
+title = "AI 设置"
+size = Vector2i(560, 520)
+visible = false
+transient = true
+exclusive = true
+unresizable = true
+script = ExtResource("1_settings")
+
+[node name="Root" type="MarginContainer" parent="." unique_id=1365947808]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="Box" type="VBoxContainer" parent="Root" unique_id=213411792]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Scroll" type="ScrollContainer" parent="Root/Box" unique_id=51388028]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Grid" type="GridContainer" parent="Root/Box/Scroll" unique_id=845563033]
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 2
+
+[node name="LabelBaseUrl" type="Label" parent="Root/Box/Scroll/Grid" unique_id=923150084]
+layout_mode = 2
+text = "API 地址"
+
+[node name="BaseUrl" type="LineEdit" parent="Root/Box/Scroll/Grid" unique_id=741755328]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "https://api.openai.com/v1"
+
+[node name="LabelApiKey" type="Label" parent="Root/Box/Scroll/Grid" unique_id=1360543537]
+layout_mode = 2
+text = "API Key"
+
+[node name="ApiKey" type="LineEdit" parent="Root/Box/Scroll/Grid" unique_id=1472139519]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "sk-..."
+secret = true
+
+[node name="LabelModel" type="Label" parent="Root/Box/Scroll/Grid" unique_id=200041254]
+layout_mode = 2
+text = "模型"
+
+[node name="Model" type="LineEdit" parent="Root/Box/Scroll/Grid" unique_id=1738545297]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "gpt-4o-mini"
+
+[node name="LabelTemperature" type="Label" parent="Root/Box/Scroll/Grid" unique_id=11805354]
+layout_mode = 2
+text = "温度"
+
+[node name="Temperature" type="SpinBox" parent="Root/Box/Scroll/Grid" unique_id=1686955957]
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 2.0
+step = 0.1
+value = 0.7
+
+[node name="LabelReasoning" type="Label" parent="Root/Box/Scroll/Grid" unique_id=6763645]
+layout_mode = 2
+text = "思考强度"
+
+[node name="Reasoning" type="OptionButton" parent="Root/Box/Scroll/Grid" unique_id=2116668889]
+layout_mode = 2
+size_flags_horizontal = 3
+item_count = 5
+popup/item_0/text = "关闭"
+popup/item_0/id = 0
+popup/item_1/text = "低"
+popup/item_1/id = 1
+popup/item_2/text = "中"
+popup/item_2/id = 2
+popup/item_3/text = "高"
+popup/item_3/id = 3
+popup/item_4/text = "max"
+popup/item_4/id = 4
+
+[node name="LabelExtraBody" type="Label" parent="Root/Box/Scroll/Grid" unique_id=1968803491]
+layout_mode = 2
+text = "额外请求参数"
+
+[node name="ExtraBody" type="LineEdit" parent="Root/Box/Scroll/Grid" unique_id=602669411]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "{...}"
+
+[node name="LabelToolRounds" type="Label" parent="Root/Box/Scroll/Grid" unique_id=252737997]
+layout_mode = 2
+text = "工具轮数上限"
+
+[node name="ToolRounds" type="SpinBox" parent="Root/Box/Scroll/Grid" unique_id=820950826]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 1.0
+max_value = 200.0
+value = 30.0
+
+[node name="LabelSnapshots" type="Label" parent="Root/Box/Scroll/Grid" unique_id=331098712]
+layout_mode = 2
+text = "每轮截图上限"
+
+[node name="Snapshots" type="SpinBox" parent="Root/Box/Scroll/Grid" unique_id=912456330]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 1.0
+max_value = 50.0
+value = 5.0
+
+[node name="LabelMcPath" type="Label" parent="Root/Box/Scroll/Grid" unique_id=2013632486]
+layout_mode = 2
+text = "我的世界目录"
+
+[node name="McPathRow" type="HBoxContainer" parent="Root/Box/Scroll/Grid" unique_id=1560089023]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="McPath" type="LineEdit" parent="Root/Box/Scroll/Grid/McPathRow" unique_id=1367025671]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "D:\\MC\\.minecraft"
+
+[node name="McScan" type="Button" parent="Root/Box/Scroll/Grid/McPathRow" unique_id=2086053302]
+layout_mode = 2
+focus_mode = 0
+text = "扫描"
+
+[node name="LabelMcVersion" type="Label" parent="Root/Box/Scroll/Grid" unique_id=1705103281]
+layout_mode = 2
+text = "我的世界版本"
+
+[node name="McVersion" type="OptionButton" parent="Root/Box/Scroll/Grid" unique_id=833219987]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Hint" type="Label" parent="Root/Box" unique_id=919050002]
+modulate = Color(1, 1, 1, 0.6)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "支持 OpenAI 兼容接口，地址会自动补全 /chat/completions。选「关闭」会按常见供应商（DeepSeek / 方舟 / 智谱 / 百炼）发送关闭字段；其他接口请用额外请求参数指定，例如 {\"thinking\":{\"type\":\"disabled\"}}。"
+autowrap_mode = 3
+
+[node name="Buttons" type="HBoxContainer" parent="Root/Box" unique_id=1629994580]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 2
+
+[node name="CancelButton" type="Button" parent="Root/Box/Buttons" unique_id=460132450]
+custom_minimum_size = Vector2(88, 32)
+layout_mode = 2
+focus_mode = 0
+text = "取消"
+
+[node name="SaveButton" type="Button" parent="Root/Box/Buttons" unique_id=1985188106]
+custom_minimum_size = Vector2(88, 32)
+layout_mode = 2
+focus_mode = 0
+text = "保存"
+
+[connection signal="close_requested" from="." to="." method="OnCloseRequested"]
+[connection signal="pressed" from="Root/Box/Scroll/Grid/McPathRow/McScan" to="." method="OnScanPressed"]
+[connection signal="pressed" from="Root/Box/Buttons/CancelButton" to="." method="OnCancelPressed"]
+[connection signal="pressed" from="Root/Box/Buttons/SaveButton" to="." method="Save"]

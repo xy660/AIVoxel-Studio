@@ -1,0 +1,134 @@
+[gd_scene format=3 uid="uid://d0elcd5shxs8h"]
+
+[ext_resource type="Script" uid="uid://dg8d5dc7nntde" path="res://UI/MainMenu.cs" id="1_menu"]
+[ext_resource type="PackedScene" uid="uid://b5wt0ps8yn5h8" path="res://UI/SettingsDialog.tscn" id="2_settings"]
+[ext_resource type="PackedScene" path="res://UI/SaveContextMenu.tscn" id="3_save_menu"]
+[ext_resource type="PackedScene" uid="uid://dwgfwcyyrc743" path="res://UI/RenameSaveDialog.tscn" id="4_rename"]
+[ext_resource type="PackedScene" path="res://UI/ConfirmDialog.tscn" id="5_confirm"]
+[ext_resource type="PackedScene" uid="uid://dgbkvdf3p5emv" path="res://UI/NewSaveDialog.tscn" id="6_new"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.07, 0.08, 0.1, 0.98)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 0.12)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="MainMenu" type="Control" unique_id=1273889939]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_menu")
+
+[node name="Bg" type="ColorRect" parent="." unique_id=805158973]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.06, 0.08, 1)
+
+[node name="Center" type="CenterContainer" parent="." unique_id=734009023]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="Center" unique_id=2111237969]
+custom_minimum_size = Vector2(440, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="Margin" type="MarginContainer" parent="Center/Panel" unique_id=395275974]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 18
+
+[node name="Box" type="VBoxContainer" parent="Center/Panel/Margin" unique_id=1668207839]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Center/Panel/Margin/Box" unique_id=1597617621]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "AIVoxel Studio"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="Center/Panel/Margin/Box" unique_id=271609146]
+modulate = Color(1, 1, 1, 0.55)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "体素建模工具"
+horizontal_alignment = 1
+
+[node name="Separator" type="HSeparator" parent="Center/Panel/Margin/Box" unique_id=1026289969]
+layout_mode = 2
+
+[node name="SaveList" type="ItemList" parent="Center/Panel/Margin/Box" unique_id=1448456201]
+custom_minimum_size = Vector2(0, 210)
+layout_mode = 2
+
+[node name="OpenButton" type="Button" parent="Center/Panel/Margin/Box" unique_id=343024641]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+focus_mode = 0
+text = "打开方案"
+
+[node name="NewButton" type="Button" parent="Center/Panel/Margin/Box" unique_id=2055862648]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+focus_mode = 0
+text = "新建方案"
+
+[node name="SettingsButton" type="Button" parent="Center/Panel/Margin/Box" unique_id=1690635177]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+focus_mode = 0
+text = "AI 设置"
+
+[node name="QuitButton" type="Button" parent="Center/Panel/Margin/Box" unique_id=568352520]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+focus_mode = 0
+text = "退出"
+
+[node name="Status" type="Label" parent="Center/Panel/Margin/Box" unique_id=312504332]
+modulate = Color(1, 1, 1, 0.7)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+autowrap_mode = 3
+
+[node name="SettingsDialog" parent="." unique_id=1173805813 instance=ExtResource("2_settings")]
+
+[node name="SaveContextMenu" parent="." unique_id=1946880184 instance=ExtResource("3_save_menu")]
+
+[node name="RenameSaveDialog" parent="." unique_id=547677644 instance=ExtResource("4_rename")]
+
+[node name="ConfirmDialog" parent="." unique_id=711047512 instance=ExtResource("5_confirm")]
+
+[node name="NewSaveDialog" parent="." unique_id=1906589311 instance=ExtResource("6_new")]
+
+[connection signal="item_activated" from="Center/Panel/Margin/Box/SaveList" to="." method="OnSaveActivated"]
+[connection signal="item_selected" from="Center/Panel/Margin/Box/SaveList" to="." method="OnSaveSelected"]
+[connection signal="pressed" from="Center/Panel/Margin/Box/OpenButton" to="." method="OpenSelected"]
+[connection signal="pressed" from="Center/Panel/Margin/Box/NewButton" to="." method="OpenNewDialog"]
+[connection signal="pressed" from="Center/Panel/Margin/Box/SettingsButton" to="." method="OpenSettings"]
+[connection signal="pressed" from="Center/Panel/Margin/Box/QuitButton" to="." method="QuitApp"]
+[connection signal="id_pressed" from="SaveContextMenu" to="." method="OnSaveMenuPressed"]
+[connection signal="confirmed" from="RenameSaveDialog" to="." method="RenameSave"]
+[connection signal="canceled" from="ConfirmDialog" to="." method="OnConfirmCanceled"]
+[connection signal="confirmed" from="ConfirmDialog" to="." method="OnConfirmAccepted"]
+[connection signal="confirmed" from="NewSaveDialog" to="." method="CreateProject"]

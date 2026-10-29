@@ -1,0 +1,135 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://UI/PauseMenu.cs" id="1_pause"]
+[ext_resource type="PackedScene" path="res://UI/NewSaveDialog.tscn" id="2_newsave"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.06, 0.07, 0.09, 0.96)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 0.14)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="PauseMenu" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_pause")
+
+[node name="PauseRoot" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Dim" type="ColorRect" parent="PauseRoot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+color = Color(0, 0, 0, 0.55)
+
+[node name="Center" type="CenterContainer" parent="PauseRoot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="PauseRoot/Center"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="Box" type="VBoxContainer" parent="PauseRoot/Center/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="PauseRoot/Center/Panel/Box"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "菜单"
+horizontal_alignment = 1
+
+[node name="ContinueButton" type="Button" parent="PauseRoot/Center/Panel/Box"]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+focus_mode = 0
+text = "继续编辑"
+
+[node name="SaveButton" type="Button" parent="PauseRoot/Center/Panel/Box"]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+focus_mode = 0
+text = "保存"
+
+[node name="ExportButton" type="Button" parent="PauseRoot/Center/Panel/Box"]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+focus_mode = 0
+text = "导出 OBJ"
+
+[node name="LoadButton" type="Button" parent="PauseRoot/Center/Panel/Box"]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+focus_mode = 0
+text = "打开方案"
+
+[node name="NewButton" type="Button" parent="PauseRoot/Center/Panel/Box"]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+focus_mode = 0
+text = "新建方案"
+
+[node name="SettingsButton" type="Button" parent="PauseRoot/Center/Panel/Box"]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+focus_mode = 0
+text = "AI 设置"
+
+[node name="MenuButton" type="Button" parent="PauseRoot/Center/Panel/Box"]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+focus_mode = 0
+text = "返回主界面"
+
+[node name="SaveList" type="ItemList" parent="PauseRoot/Center/Panel/Box"]
+visible = false
+custom_minimum_size = Vector2(0, 150)
+layout_mode = 2
+
+[node name="Status" type="Label" parent="PauseRoot/Center/Panel/Box"]
+modulate = Color(1, 1, 1, 0.7)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+autowrap_mode = 3
+
+[node name="Hint" type="Label" parent="PauseRoot/Center/Panel/Box"]
+modulate = Color(1, 1, 1, 0.45)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Esc 关闭菜单"
+horizontal_alignment = 1
+
+[node name="NewSaveDialog" parent="." instance=ExtResource("2_newsave")]
+
+[connection signal="pressed" from="PauseRoot/Center/Panel/Box/ContinueButton" to="." method="Close"]
+[connection signal="pressed" from="PauseRoot/Center/Panel/Box/SaveButton" to="." method="RequestSave"]
+[connection signal="pressed" from="PauseRoot/Center/Panel/Box/ExportButton" to="." method="OnExportPressed"]
+[connection signal="pressed" from="PauseRoot/Center/Panel/Box/LoadButton" to="." method="ToggleSaves"]
+[connection signal="pressed" from="PauseRoot/Center/Panel/Box/NewButton" to="." method="OpenNewDialog"]
+[connection signal="pressed" from="PauseRoot/Center/Panel/Box/SettingsButton" to="." method="OpenSettings"]
+[connection signal="pressed" from="PauseRoot/Center/Panel/Box/MenuButton" to="." method="ReturnToMainMenu"]
+[connection signal="item_activated" from="PauseRoot/Center/Panel/Box/SaveList" to="." method="LoadSelected"]
+[connection signal="confirmed" from="NewSaveDialog" to="." method="CreateWorld"]

@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[node name="SessionContextMenu" type="PopupMenu"]
+item_count = 1
+item_0/text = "删除对话"
+item_0/id = 0
