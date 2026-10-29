@@ -29,7 +29,7 @@ An open-source voxel modeling tool built with Godot 4.7 and C#, featuring AI-ass
 - [ ] FBX 导出
 - [x] Minecraft JE存档导出（仅我的世界方案）
 - [x] Minecraft NBT导出（仅我的世界方案）
-- [ ] Agent 提问工具
+- [x] Agent 提问工具
 
 ## Quick Start
 

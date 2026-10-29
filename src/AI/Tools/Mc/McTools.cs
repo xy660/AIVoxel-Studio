@@ -22,21 +22,6 @@ public static class McTools
         registry.RegisterTool(new GetBlockStateTool());
     }
 
-    private abstract class ToolBase : ITool
-    {
-        public abstract string Name { get; }
-        public abstract string Description { get; }
-        public abstract JsonObject ParametersSchema { get; }
-
-        public Task<ToolResult> ExecuteAsync(JsonObject args, ToolContext context) => RunAsync(args, context);
-
-        protected virtual Task<ToolResult> RunAsync(JsonObject args, ToolContext context) =>
-            Task.FromResult(Run(args, context));
-
-        protected virtual ToolResult Run(JsonObject args, ToolContext context) =>
-            ToolResult.Failure("工具未实现");
-    }
-
     private static McToolContext M(ToolContext context) =>
         context as McToolContext ??
         throw new InvalidOperationException("当前模式不支持我的世界工具");
@@ -49,7 +34,7 @@ public static class McTools
             "properties 可选，键为裸属性名（如 facing、half），未给出的属性自动用默认值。" +
             "门/床/高植物等两格方块会自动补全另一格。";
 
-        public override JsonObject ParametersSchema => Schema(
+        public override JsonObject ParametersSchema => ToolSchema.Schema(
             ("x", "integer", "方块 X", true),
             ("y", "integer", "方块 Y", true),
             ("z", "integer", "方块 Z", true),
@@ -74,7 +59,7 @@ public static class McTools
         public override string Name => "Erase";
         public override string Description => "把指定坐标的方块清除为空气；门/床等两格方块会同时清除另一格。";
 
-        public override JsonObject ParametersSchema => Schema(
+        public override JsonObject ParametersSchema => ToolSchema.Schema(
             ("x", "integer", "方块 X", true),
             ("y", "integer", "方块 Y", true),
             ("z", "integer", "方块 Z", true));
@@ -96,7 +81,7 @@ public static class McTools
         public override string Description =>
             "用同一种方块填充闭区间长方体（含 x1/x2、y1/y2、z1/z2 两端）。properties 可选。";
 
-        public override JsonObject ParametersSchema => Schema(
+        public override JsonObject ParametersSchema => ToolSchema.Schema(
             ("x1", "integer", "起点 X", true),
             ("y1", "integer", "起点 Y", true),
             ("z1", "integer", "起点 Z", true),
@@ -153,7 +138,7 @@ public static class McTools
             "在闭区间长方体内，把匹配的方块替换为目标方块。from 传方块 ID 或 *（* 表示任意非空气方块）；" +
             "targetId 与 properties 指定目标状态。";
 
-        public override JsonObject ParametersSchema => Schema(
+        public override JsonObject ParametersSchema => ToolSchema.Schema(
             ("x1", "integer", "起点 X", true),
             ("y1", "integer", "起点 Y", true),
             ("z1", "integer", "起点 Z", true),
@@ -217,7 +202,7 @@ public static class McTools
         public override string Name => "GetBlock";
         public override string Description => "查询指定坐标的方块状态字符串与名称。";
 
-        public override JsonObject ParametersSchema => Schema(
+        public override JsonObject ParametersSchema => ToolSchema.Schema(
             ("x", "integer", "方块 X", true),
             ("y", "integer", "方块 Y", true),
             ("z", "integer", "方块 Z", true));
@@ -250,7 +235,7 @@ public static class McTools
         {
             get
             {
-                var schema = Schema(
+                var schema = ToolSchema.Schema(
                     ("x1", "integer", "区域起点 X（区域模式必填）", false),
                     ("y1", "integer", "区域起点 Y（区域模式必填）", false),
                     ("z1", "integer", "区域起点 Z（区域模式必填）", false),
@@ -349,7 +334,7 @@ public static class McTools
             "搜索可用的我的世界方块。query 可匹配方块 ID 或英文名（留空列出全部），page 从 1 开始，每页 30 条。" +
             "返回结果含方块 ID、名称与默认状态；需要属性细节时再调用 GetBlockState。";
 
-        public override JsonObject ParametersSchema => Schema(
+        public override JsonObject ParametersSchema => ToolSchema.Schema(
             ("query", "string", "搜索词，可为空", false),
             ("page", "integer", "页码，从 1 开始", false));
 
@@ -393,7 +378,7 @@ public static class McTools
         public override string Description =>
             "查询某个方块的全部属性、取值与默认值，并给出默认状态字符串。放方块前可用它确认属性写法。";
 
-        public override JsonObject ParametersSchema => Schema(
+        public override JsonObject ParametersSchema => ToolSchema.Schema(
             ("blockId", "string", "方块 ID，如 minecraft:oak_stairs", true));
 
         protected override ToolResult Run(JsonObject args, ToolContext context)
@@ -497,20 +482,5 @@ public static class McTools
             }
         }
         return true;
-    }
-
-    private static JsonObject Schema(params (string Name, string Type, string Desc, bool Required)[] properties)
-    {
-        var props = new JsonObject();
-        var required = new JsonArray();
-        foreach (var (name, type, desc, isRequired) in properties)
-        {
-            props[name] = new JsonObject { ["type"] = type, ["description"] = desc };
-            if (isRequired) required.Add(name);
-        }
-
-        var result = new JsonObject { ["type"] = "object", ["properties"] = props };
-        if (required.Count > 0) result["required"] = required;
-        return result;
     }
 }

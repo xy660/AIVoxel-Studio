@@ -91,6 +91,7 @@ public sealed class McBuildProfile : IBuildProfile
         RegionCount = () => _world.SectionCount,
         RenderSnapshot = environment.RenderSnapshot,
         SaveAttachment = environment.SaveAttachment,
+        AskUser = environment.AskUser,
         BlockMeters = BlockMeters,
         ModeName = DisplayName,
     };

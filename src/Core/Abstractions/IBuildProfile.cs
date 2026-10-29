@@ -40,4 +40,5 @@ public sealed class ToolContextEnvironment
     public Func<Vector3I> PlayerBlock { get; init; }
     public Func<Vector3, Vector3, Task<Image>> RenderSnapshot { get; init; }
     public Func<Image, string> SaveAttachment { get; init; }
+    public Func<IReadOnlyList<AskQuestion>, Task<IReadOnlyList<string>>> AskUser { get; init; }
 }

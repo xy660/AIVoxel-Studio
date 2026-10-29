@@ -257,6 +257,7 @@ public partial class Main : Node3D
                 Mathf.FloorToInt(Player.GlobalPosition.Z / Profile.BlockMeters)),
             RenderSnapshot = CaptureSnapshotAsync,
             SaveAttachment = image => store.SaveAttachment(image),
+            AskUser = questions => ChatUi.AskUserAsync(questions),
         });
 
         ChatUi = GD.Load<PackedScene>("res://UI/ChatPanel.tscn").Instantiate<ChatPanel>();

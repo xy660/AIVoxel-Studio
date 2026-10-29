@@ -1,0 +1,56 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://UI/AskUserDialog.cs" id="1_script"]
+
+[node name="AskDialog" type="Window"]
+title = "AI 提问"
+size = Vector2i(600, 480)
+visible = false
+exclusive = true
+transient = true
+script = ExtResource("1_script")
+
+[node name="Root" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="VBox" type="VBoxContainer" parent="Root"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Hint" type="Label" parent="Root/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.62)
+theme_override_font_sizes/font_size = 12
+text = "AI 想先确认一些细节。每题选一项，也可以选「其他」自行填写；直接提交或关闭窗口表示跳过。"
+autowrap_mode = 2
+
+[node name="Scroll" type="ScrollContainer" parent="Root/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Questions" type="VBoxContainer" parent="Root/VBox/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="Footer" type="HBoxContainer" parent="Root/VBox"]
+layout_mode = 2
+alignment = 2
+theme_override_constants/separation = 8
+
+[node name="SkipButton" type="Button" parent="Root/VBox/Footer"]
+layout_mode = 2
+focus_mode = 0
+text = "跳过"
+
+[node name="SubmitButton" type="Button" parent="Root/VBox/Footer"]
+layout_mode = 2
+focus_mode = 0
+text = "提交"

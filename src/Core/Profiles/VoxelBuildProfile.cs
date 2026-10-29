@@ -84,6 +84,7 @@ public sealed class VoxelBuildProfile : IBuildProfile
         RegionCount = () => _world.ChunkCount,
         RenderSnapshot = environment.RenderSnapshot,
         SaveAttachment = environment.SaveAttachment,
+        AskUser = environment.AskUser,
         BlockMeters = BlockMeters,
         ModeName = DisplayName,
     };

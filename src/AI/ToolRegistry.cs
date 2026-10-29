@@ -16,6 +16,12 @@ public sealed class ToolResult
 	public static ToolResult Failure(string content) => new() { Ok = false, Content = content };
 }
 
+public sealed class AskQuestion
+{
+	public string Prompt { get; init; } = "";
+	public IReadOnlyList<string> Options { get; init; } = Array.Empty<string>();
+}
+
 public class ToolContext
 {
 	public Func<Vector3I> PlayerBlock { get; init; } = () => Vector3I.Zero;
@@ -23,6 +29,9 @@ public class ToolContext
 	public Func<int> RegionCount { get; init; } = () => 0;
 	public Func<Vector3, Vector3, Task<Image>> RenderSnapshot { get; init; }
 	public Func<Image, string> SaveAttachment { get; init; }
+
+	/// <summary>弹出提问框并等待用户作答；返回答案列表，用户跳过时返回空列表。</summary>
+	public Func<IReadOnlyList<AskQuestion>, Task<IReadOnlyList<string>>> AskUser { get; init; }
 	public float BlockMeters { get; init; } = 1f;
 	public string ModeName { get; init; } = "";
 }

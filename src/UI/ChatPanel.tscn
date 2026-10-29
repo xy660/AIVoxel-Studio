@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" path="res://UI/ConfirmDialog.tscn" id="2_confirm"]
 [ext_resource type="PackedScene" path="res://UI/HistoryMenu.tscn" id="3_history"]
 [ext_resource type="PackedScene" path="res://UI/SessionContextMenu.tscn" id="4_session"]
+[ext_resource type="PackedScene" path="res://UI/AskUserDialog.tscn" id="5_ask"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 content_margin_left = 10.0
@@ -125,6 +126,8 @@ filters = PackedStringArray("*.png, *.jpg, *.jpeg, *.webp ; 图片")
 [node name="HistoryMenu" parent="ChatRoot/ChatPanel/Main" instance=ExtResource("3_history")]
 
 [node name="SessionContextMenu" parent="ChatRoot/ChatPanel/Main" instance=ExtResource("4_session")]
+
+[node name="AskDialog" parent="." instance=ExtResource("5_ask")]
 
 [connection signal="pressed" from="ChatRoot/ChatPanel/Main/Header/HistoryButton" to="." method="ShowHistoryMenu"]
 [connection signal="pressed" from="ChatRoot/ChatPanel/Main/Header/NewChatButton" to="." method="NewSession"]

@@ -27,21 +27,6 @@ public static class BuiltinTools
         context as VoxelToolContext ??
         throw new InvalidOperationException("当前模式不支持纯色体素工具");
 
-    private abstract class ToolBase : ITool
-    {
-        public abstract string Name { get; }
-        public abstract string Description { get; }
-        public abstract JsonObject ParametersSchema { get; }
-
-        public Task<ToolResult> ExecuteAsync(JsonObject args, ToolContext context) => RunAsync(args, context);
-
-        protected virtual Task<ToolResult> RunAsync(JsonObject args, ToolContext context) =>
-            Task.FromResult(Run(args, context));
-
-        protected virtual ToolResult Run(JsonObject args, ToolContext context) =>
-            ToolResult.Failure("工具未实现");
-    }
-
     private sealed class Writer
     {
         private readonly VoxelToolContext _context;

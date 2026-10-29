@@ -21,6 +21,7 @@ public partial class ChatPanel : CanvasLayer, IUiCallback
 	private HistoryMenu _historyMenu;
 	private PopupMenu _sessionMenu;
 	private ConfirmationDialog _confirmDialog;
+	private AskUserDialog _askDialog;
 	private List<ChatSessionInfo> _historySessions = new();
 	private string _pendingDeleteId = "";
 	private HBoxContainer _pendingBox;
@@ -71,6 +72,7 @@ public partial class ChatPanel : CanvasLayer, IUiCallback
 		_sessionMenu.IdPressed += _ => RequestDeleteSession(_pendingDeleteId);
 
 		_confirmDialog = GetNode<ConfirmationDialog>("ConfirmDialog");
+		_askDialog = GetNode<AskUserDialog>("AskDialog");
 	}
 
 	public void OpenImageDialog() => _imageDialog.PopupCentered();
@@ -235,10 +237,25 @@ public partial class ChatPanel : CanvasLayer, IUiCallback
 	{
 		if (_busy)
 		{
+			_askDialog?.CancelPending();
 			_engine?.Cancel();
 			return;
 		}
 		SendCurrent();
+	}
+
+	/// <summary>给 AI 工具用的提问入口：弹窗独立于聊天框是否打开，并保证鼠标可用。</summary>
+	public async Task<IReadOnlyList<string>> AskUserAsync(IReadOnlyList<AskQuestion> questions)
+	{
+		if (_player?.InputEnabled ?? false) _player.SetInputEnabled(false);
+		try
+		{
+			return await _askDialog.AskAsync(questions);
+		}
+		finally
+		{
+			if (!IsOpen) _player?.SetInputEnabled(true);
+		}
 	}
 
 	private async void SendCurrent()
@@ -681,6 +698,10 @@ public partial class ChatPanel : CanvasLayer, IUiCallback
 				_reasoningLabel = null;
 				_reasoningToggle = null;
 				_reasoningExpanded = false;
+			}
+			else
+			{
+				_askDialog?.CancelPending();
 			}
 			_sendButton.Text = busy ? "停止" : "发送";
 			_status.Text = busy ? "AI 正在生成…" : "";
