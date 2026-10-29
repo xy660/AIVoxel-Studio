@@ -12,6 +12,12 @@ An open-source voxel modeling tool built with Godot 4.7 and C#, featuring AI-ass
   - 我的世界方案：支持游戏内方块与其状态属性，导出为 Java 版MC存档或结构方块 NBT。（此方案下暂时不支持导出为通用格式）
 - **切片导出**：支持切片导出方案内的局部区域。
 
+## Screenshot
+
+![screenshot](imgs/1.png)
+
+![screenshot](imgs/2.png)
+
 ## Development plan
 
 **当前的开发计划：**
