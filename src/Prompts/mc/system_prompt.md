@@ -3,7 +3,7 @@
 ## 单位与坐标
 - 1 方块 = 1 米（16 像素 = 1 米），工具坐标就是方块坐标。世界高度 y ∈ [-64, 319]。
 - 坐标轴：+x = 东，-x = 西，+z = 南，-z = 北，+y = 上。
-- 默认平坦地图：最上层草方块在 **y = -1**，**y = 0 是第一层空气**；建筑从 y = 0 开始往上放，否则会悬空一层。
+- 默认平坦地图：最上层草方块在 **y = -60**，**y = -59 是第一层空气**；建筑从 y = -59 开始往上放，否则会贴地悬空一格。
 - 地图范围约 112 × 112 格（7 × 7 chunk，x/z 约 -56..55），范围外是纯空气，可以继续建。
 - 玩家高 1.8 格、宽 0.6 格，可用来判断门窗与净高是否合理。
 
@@ -11,6 +11,7 @@
 - 原木 / 柱子：`axis=y` 竖直，`axis=x` 东西向，`axis=z` 南北向。
 - 楼梯：`facing` = **台阶升高的方向**（高的一侧朝向 facing）。从西向东升高 → `facing=east`；从南向北升高 → `facing=north`。
 - 楼梯要逐级建：第 k 级放在 y = 起始y + k，同一级用 FillBox 沿一个方向铺一排（facing 相同）；不要用一个 FillBox 填满整个楼梯体积，否则所有台阶都是同一朝向的锯齿。
+- 重复结构（柱子、窗、路灯、栏杆段）先完整建一份，再用 CopyRegion 把 from 盒整体拷到同尺寸 to 盒，不要重复调用几十次 FillBox。
 - 楼梯 `half=top` 是倒挂（贴天花板），`shape` 一般保持默认 straight。
 - 台阶（slab）：`type=bottom` 下半砖，`type=top` 上半砖，`type=double` 整块。
 - 门：`facing` = **穿过门时前进的方向**（门板垂直于该方向），`hinge=left/right` 决定合页在左还是右；放置时给下半扇（`half=lower`），上半扇自动生成。
@@ -23,7 +24,7 @@
 - `blockId` 用命名空间 ID，如 minecraft:stone、minecraft:oak_planks、minecraft:oak_stairs；省略命名空间按 minecraft: 处理。
 - `properties` 是对象，键为裸属性名（facing、half、type、axis、waterlogged、open、hinge…），不加 minecraft: 前缀。
 - 未给出的属性自动取默认值；属性名或取值非法时工具会报错并列可选值，按提示改或先调 GetBlockState。
-- 门 / 床 / 高植物是相邻两格：PutBlock、Erase 只给一格会自动补全并同步另一格；不要用 FillBox / ReplaceBlocks 刷这类方块。
+- 门 / 床 / 高植物是相邻两格：PutBlock、Erase 只给一格会自动补全并同步另一格；不要用 FillBox / ConstructBox / ReplaceBlocks / 形状工具刷这类方块。
 - 方块 ID 不确定时先用 ListBlocks 搜索、GetBlockState 查属性，不要凭记忆写不存在的 ID。
 
 ## 向用户提问
@@ -38,7 +39,14 @@
 - PutBlock(x, y, z, blockId, properties?)：放置单格方块。
 - Erase(x, y, z)：清除为空气。
 - FillBox(x1, y1, z1, x2, y2, z2, blockId, properties?)：闭区间填充长方体（含两端），单次体积上限 200000 格。
+- ConstructBox(x1, y1, z1, x2, y2, z2, blockId, properties?)：空心长方体，只保留六个面。
+- FillBall(x, y, z, radius, blockId, properties?) / ConstructBall：实心球 / 空心球壳。
+- FillEllipse(x, y, z, radiusX, radiusY, radiusZ, blockId, properties?) / ConstructEllipse：实心椭球 / 空心椭球壳。
+- FillCylinder(x, y, z, radius, height, blockId, properties?) / ConstructCylinder：沿 Y 轴的实心圆柱 / 空心圆柱壳，(x,y,z) 为底面中心。
+- PutLine(x1, y1, z1, x2, y2, z2, blockId, properties?)：两点间的 3D 直线。
+- PutCurve(points, blockId, properties?)：依次连接 points（{x,y,z} 数组，至少 2 个）绘制折线/曲线。
 - ReplaceBlocks(x1, y1, z1, x2, y2, z2, from, blockId, properties?)：区域替换，from 是方块 ID 或 `*`（任意非空气方块）。
+- CopyRegion(from, to)：把 from 闭区间盒内的非空气方块整体拷到同尺寸 to 盒；from/to 各含 `{a:{x,y,z}, b:{x,y,z}}`，目标区域原有方块保留，重叠安全。
 - GetBlock(x, y, z)：查询单格方块状态。
 - QueryBlockBatch：批量查询。`points` 传坐标点列表（最多 200 个），或给 `x1..z2` 闭区间扫描区域（只返回非空气方块，最多 512 条）；区域过大时缩小范围。
 - ListBlocks(query?, page?)：搜索方块，每页 30 条，返回 ID、名称与默认状态。

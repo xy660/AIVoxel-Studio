@@ -20,6 +20,8 @@ public static class McTools
         registry.RegisterTool(new GetBlockBatchTool());
         registry.RegisterTool(new ListBlocksTool());
         registry.RegisterTool(new GetBlockStateTool());
+        registry.RegisterTool(new McCopyRegionTool());
+        McShapeTools.RegisterAll(registry);
     }
 
     private static McToolContext M(ToolContext context) =>
@@ -416,7 +418,7 @@ public static class McTools
         }
     }
 
-    private static bool TryState(
+    internal static bool TryState(
         McToolContext context, JsonObject args,
         out McBlockState state, out Dictionary<string, string> explicitProps, out string error)
     {
@@ -456,7 +458,7 @@ public static class McTools
         return true;
     }
 
-    private static bool TryInt(JsonObject args, string name, out int value)
+    internal static bool TryInt(JsonObject args, string name, out int value)
     {
         value = 0;
         if (args[name] is not JsonValue node) return false;
@@ -469,7 +471,7 @@ public static class McTools
         return false;
     }
 
-    private static bool TryInts(JsonObject args, string[] names, out int[] values, out string error)
+    internal static bool TryInts(JsonObject args, string[] names, out int[] values, out string error)
     {
         values = new int[names.Length];
         error = null;

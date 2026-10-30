@@ -86,7 +86,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
-[node name="PendingImages" type="HBoxContainer" parent="ChatRoot/ChatPanel/Main"]
+[node name="PendingImages" type="HBoxContainer" parent="ChatRoot/ChatPanel/Main" unique_id=1494056645]
 visible = false
 layout_mode = 2
 theme_override_constants/separation = 6
@@ -94,18 +94,22 @@ theme_override_constants/separation = 6
 [node name="InputRow" type="HBoxContainer" parent="ChatRoot/ChatPanel/Main" unique_id=47363902]
 layout_mode = 2
 
-[node name="ImageButton" type="Button" parent="ChatRoot/ChatPanel/Main/InputRow"]
+[node name="ImageButton" type="Button" parent="ChatRoot/ChatPanel/Main/InputRow" unique_id=1851494869]
 layout_mode = 2
+size_flags_vertical = 4
 focus_mode = 0
 text = "图片"
 
-[node name="Input" type="LineEdit" parent="ChatRoot/ChatPanel/Main/InputRow" unique_id=1396240310]
+[node name="Input" type="TextEdit" parent="ChatRoot/ChatPanel/Main/InputRow" unique_id=1396240310]
+custom_minimum_size = Vector2(0, 30)
 layout_mode = 2
 size_flags_horizontal = 3
-placeholder_text = "描述你想建造的内容，Enter 发送"
+placeholder_text = "描述你想建造的内容,Ctrl+Enter 换行"
+wrap_mode = 1
 
 [node name="SendButton" type="Button" parent="ChatRoot/ChatPanel/Main/InputRow" unique_id=855041183]
 layout_mode = 2
+size_flags_vertical = 4
 focus_mode = 0
 text = "发送"
 
@@ -114,20 +118,20 @@ modulate = Color(1, 1, 1, 0.6)
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 
-[node name="ImageDialog" type="FileDialog" parent="ChatRoot"]
-title = "选择图片"
+[node name="HistoryMenu" parent="ChatRoot/ChatPanel/Main" unique_id=1548647302 instance=ExtResource("3_history")]
+
+[node name="SessionContextMenu" parent="ChatRoot/ChatPanel/Main" unique_id=1316672202 instance=ExtResource("4_session")]
+
+[node name="ImageDialog" type="FileDialog" parent="ChatRoot" unique_id=1981086160]
+title = "Open File(s)"
 size = Vector2i(760, 500)
 file_mode = 1
 access = 2
 filters = PackedStringArray("*.png, *.jpg, *.jpeg, *.webp ; 图片")
 
-[node name="ConfirmDialog" parent="." instance=ExtResource("2_confirm")]
+[node name="ConfirmDialog" parent="." unique_id=1417317374 instance=ExtResource("2_confirm")]
 
-[node name="HistoryMenu" parent="ChatRoot/ChatPanel/Main" instance=ExtResource("3_history")]
-
-[node name="SessionContextMenu" parent="ChatRoot/ChatPanel/Main" instance=ExtResource("4_session")]
-
-[node name="AskDialog" parent="." instance=ExtResource("5_ask")]
+[node name="AskDialog" parent="." unique_id=260432346 instance=ExtResource("5_ask")]
 
 [connection signal="pressed" from="ChatRoot/ChatPanel/Main/Header/HistoryButton" to="." method="ShowHistoryMenu"]
 [connection signal="pressed" from="ChatRoot/ChatPanel/Main/Header/NewChatButton" to="." method="NewSession"]
@@ -135,5 +139,5 @@ filters = PackedStringArray("*.png, *.jpg, *.jpeg, *.webp ; 图片")
 [connection signal="pressed" from="ChatRoot/ChatPanel/Main/Header/CloseButton" to="." method="Close"]
 [connection signal="pressed" from="ChatRoot/ChatPanel/Main/InputRow/ImageButton" to="." method="OpenImageDialog"]
 [connection signal="pressed" from="ChatRoot/ChatPanel/Main/InputRow/SendButton" to="." method="OnSendPressed"]
-[connection signal="confirmed" from="ConfirmDialog" to="." method="DeletePendingSession"]
 [connection signal="canceled" from="ConfirmDialog" to="." method="OnConfirmCanceled"]
+[connection signal="confirmed" from="ConfirmDialog" to="." method="DeletePendingSession"]

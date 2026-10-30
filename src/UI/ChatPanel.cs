@@ -12,7 +12,8 @@ public partial class ChatPanel : CanvasLayer, IUiCallback
 	private PanelContainer _panel;
 	private VBoxContainer _messageBox;
 	private ScrollContainer _scroll;
-	private LineEdit _input;
+	private TextEdit _input;
+	private float _inputLineHeight = 30f;
 	private Button _sendButton;
 	private Label _status;
 	private bool _busy;
@@ -50,7 +51,10 @@ public partial class ChatPanel : CanvasLayer, IUiCallback
 		_panel = GetNode<PanelContainer>("ChatRoot/ChatPanel");
 		_scroll = GetNode<ScrollContainer>("ChatRoot/ChatPanel/Main/Scroll");
 		_messageBox = GetNode<VBoxContainer>("ChatRoot/ChatPanel/Main/Scroll/Messages");
-		_input = GetNode<LineEdit>("ChatRoot/ChatPanel/Main/InputRow/Input");
+		_input = GetNode<TextEdit>("ChatRoot/ChatPanel/Main/InputRow/Input");
+		_inputLineHeight = _input.GetLineHeight() + 8f;
+		_input.TextChanged += UpdateInputHeight;
+		UpdateInputHeight();
 		_sendButton = GetNode<Button>("ChatRoot/ChatPanel/Main/InputRow/SendButton");
 		_status = GetNode<Label>("ChatRoot/ChatPanel/Main/Status");
 		_pendingBox = GetNode<HBoxContainer>("ChatRoot/ChatPanel/Main/PendingImages");
@@ -58,10 +62,7 @@ public partial class ChatPanel : CanvasLayer, IUiCallback
 
 		_imageDialog.FileSelected += OnImageFileSelected;
 
-		_input.TextSubmitted += _ =>
-		{
-			if (!_busy) SendCurrent();
-		};
+		_input.GuiInput += OnInputGuiInput;
 		_historyButton = GetNode<Button>("ChatRoot/ChatPanel/Main/Header/HistoryButton");
 
 		_historyMenu = GetNode<HistoryMenu>("ChatRoot/ChatPanel/Main/HistoryMenu");
@@ -91,6 +92,7 @@ public partial class ChatPanel : CanvasLayer, IUiCallback
 	public override void _Input(InputEvent e)
 	{
 		if (!IsOpen || e is not InputEventKey { Pressed: true, Echo: false } key) return;
+		LogKey("_Input", key);
 		if (key.Keycode != Key.V || !key.CtrlPressed || !DisplayServer.ClipboardHasImage()) return;
 
 		var image = DisplayServer.ClipboardGetImage();
@@ -258,6 +260,55 @@ public partial class ChatPanel : CanvasLayer, IUiCallback
 		}
 	}
 
+	// 单行时保持一行高度；内容到两行及以上才增高（最多 6 行，再多内部滚动）
+	private void UpdateInputHeight()
+	{
+		int lines = Mathf.Clamp(_input.GetLineCount(), 1, 6);
+		_input.CustomMinimumSize = new Vector2(0, _inputLineHeight * lines);
+	}
+
+	// Enter 发送，Ctrl+Enter 在光标处换行；多行内容可整段粘贴
+	private void OnInputGuiInput(InputEvent @event)
+	{
+		if (@event is not InputEventKey key || !key.Pressed || key.Echo) return;
+
+		// 中文输入法或某些布局下 Keycode 可能为空，退回物理键与字符码判断
+		bool enterKey = key.Keycode == Key.Enter || key.Keycode == Key.KpEnter
+			|| key.PhysicalKeycode == Key.Enter || key.PhysicalKeycode == Key.KpEnter;
+		if (!enterKey && key.Keycode == Key.None && key.PhysicalKeycode == Key.None)
+			enterKey = key.Unicode == 10 || key.Unicode == 13;
+		if (!enterKey) return;
+		LogKey("gui_input", key);
+
+		_input.AcceptEvent();
+		// 事件里的修饰键可能丢失（Alt+Tab 后 Godot 按键状态偶尔不同步），再查一次物理按键
+		bool newline = key.CtrlPressed || key.MetaPressed || key.ShiftPressed
+			|| Input.IsPhysicalKeyPressed(Key.Ctrl);
+		if (newline)
+		{
+			_input.InsertTextAtCaret("\n");
+			UpdateInputHeight();
+			return;
+		}
+		if (!_busy) SendCurrent();
+	}
+
+	private static void LogKey(string where, InputEventKey key)
+	{
+		try
+		{
+			string path = ProjectSettings.GlobalizePath("user://chat_key_debug.log");
+			System.IO.File.AppendAllText(path,
+				$"{DateTime.Now:HH:mm:ss.fff} {where} code={key.Keycode} phys={key.PhysicalKeycode} " +
+				$"ctrl={key.CtrlPressed} meta={key.MetaPressed} shift={key.ShiftPressed} " +
+				$"pressed={key.Pressed} echo={key.Echo} uni={key.Unicode}\n");
+		}
+		catch (Exception)
+		{
+			// 诊断日志失败不影响输入
+		}
+	}
+
 	private async void SendCurrent()
 	{
 		if (_engine == null || _engine.Busy) return;
@@ -267,6 +318,7 @@ public partial class ChatPanel : CanvasLayer, IUiCallback
 		if (text.Length == 0 && images.Count == 0) return;
 
 		_input.Text = "";
+		UpdateInputHeight();
 		_pendingImages.Clear();
 		RefreshPendingImages();
 		AddBubbleMessage(true, text, images);

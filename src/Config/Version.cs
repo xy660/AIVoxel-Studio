@@ -8,7 +8,7 @@ namespace AIVoxelStudio.Config
 {
     public static class CurrentVersion
     {
-        public static string VersionString = "V1.0.0";
-        public static int VersionNumber = 1;
+        public static string VersionString = "V1.0.1";
+        public static int VersionNumber = 2;
     }
 }

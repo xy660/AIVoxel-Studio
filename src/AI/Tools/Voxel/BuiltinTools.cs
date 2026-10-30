@@ -9,8 +9,8 @@ public static class BuiltinTools
     public static void RegisterAll(ToolRegistry registry)
     {
         registry.RegisterTool(new PutBlockTool());
-        registry.RegisterTool(new FillFaceTool());
-        registry.RegisterTool(new ConstructFaceTool());
+        registry.RegisterTool(new FillBoxTool());
+        registry.RegisterTool(new ConstructBoxTool());
         registry.RegisterTool(new PutLineTool());
         registry.RegisterTool(new PutCurveTool());
         registry.RegisterTool(new FillBallTool());
@@ -19,8 +19,9 @@ public static class BuiltinTools
         registry.RegisterTool(new ConstructEllipseTool());
         registry.RegisterTool(new FillCylinderTool());
         registry.RegisterTool(new ConstructCylinderTool());
-        registry.RegisterTool(new QueryBlockTool());
+        registry.RegisterTool(new GetBlockTool());
         registry.RegisterTool(new QueryBlockBatchTool());
+        registry.RegisterTool(new VoxelCopyRegionTool());
     }
 
     private static VoxelToolContext V(ToolContext context) =>
@@ -139,9 +140,9 @@ public static class BuiltinTools
         }
     }
 
-    private sealed class FillFaceTool : ToolBase
+    private sealed class FillBoxTool : ToolBase
     {
-        public override string Name => "FillFace";
+        public override string Name => "FillBox";
         public override string Description => "用方块填满由两个对角点定义的闭区间长方体区域（实心）。";
 
         public override JsonObject ParametersSchema => Schema(
@@ -164,16 +165,16 @@ public static class BuiltinTools
             int minZ = Math.Min(v[2], v[5]), maxZ = Math.Max(v[2], v[5]);
 
             return FillShape(V(context), new Vector3I(minX, minY, minZ), new Vector3I(maxX, maxY, maxZ),
-                (x, y, z) => true, false, info, "FillFace");
+                (x, y, z) => true, false, info, "FillBox");
         }
     }
 
-    private sealed class ConstructFaceTool : ToolBase
+    private sealed class ConstructBoxTool : ToolBase
     {
-        public override string Name => "ConstructFace";
+        public override string Name => "ConstructBox";
         public override string Description => "建造空心长方体：只保留长方体的六个面（外壳），内部保持原样。";
 
-        public override JsonObject ParametersSchema => FillFaceSchema();
+        public override JsonObject ParametersSchema => BoxSchema();
 
         protected override ToolResult Run(JsonObject args, ToolContext context)
         {
@@ -187,7 +188,7 @@ public static class BuiltinTools
 
             return FillShape(V(context), new Vector3I(minX, minY, minZ), new Vector3I(maxX, maxY, maxZ),
                 (x, y, z) => x >= minX && x <= maxX && y >= minY && y <= maxY && z >= minZ && z <= maxZ,
-                true, info, "ConstructFace");
+                true, info, "ConstructBox");
         }
     }
 
@@ -427,9 +428,9 @@ public static class BuiltinTools
             hollow ? "ConstructCylinder" : "FillCylinder");
     }
 
-    private sealed class QueryBlockTool : ToolBase
+    private sealed class GetBlockTool : ToolBase
     {
-        public override string Name => "QueryBlock";
+        public override string Name => "GetBlock";
         public override string Description => "查询指定坐标的方块信息（类型、颜色、是否实心）。";
 
         public override JsonObject ParametersSchema => Schema(
@@ -555,7 +556,7 @@ public static class BuiltinTools
         }
     }
 
-    private static JsonObject FillFaceSchema() => Schema(
+    private static JsonObject BoxSchema() => Schema(
         ("x1", "integer", "起点 X", true),
         ("y1", "integer", "起点 Y", true),
         ("z1", "integer", "起点 Z", true),
