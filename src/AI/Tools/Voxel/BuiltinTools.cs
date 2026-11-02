@@ -19,6 +19,8 @@ public static class BuiltinTools
         registry.RegisterTool(new ConstructEllipseTool());
         registry.RegisterTool(new FillCylinderTool());
         registry.RegisterTool(new ConstructCylinderTool());
+        registry.RegisterTool(new FillCylinderFromToTool());
+        registry.RegisterTool(new ConstructCylinderFromToTool());
         registry.RegisterTool(new GetBlockTool());
         registry.RegisterTool(new QueryBlockBatchTool());
         registry.RegisterTool(new VoxelCopyRegionTool());
@@ -428,6 +430,67 @@ public static class BuiltinTools
             hollow ? "ConstructCylinder" : "FillCylinder");
     }
 
+    private sealed class FillCylinderFromToTool : ToolBase
+    {
+        public override string Name => "FillCylinderFromTo";
+        public override string Description =>
+            "沿两点连线填充实心圆柱：a(ax,ay,az) 与 b(bx,by,bz) 为轴线两端，radius 为半径，可做横向或倾斜圆柱。";
+
+        public override JsonObject ParametersSchema => CylinderFromToSchema();
+
+        protected override ToolResult Run(JsonObject args, ToolContext context)
+        {
+            if (!TryInts(args, new[] { "ax", "ay", "az", "bx", "by", "bz", "radius" }, out var v, out var error))
+                return ToolResult.Failure(error);
+            if (!TryBlockInfo(args, out var info, out error)) return ToolResult.Failure(error);
+            if (v[6] < 0) return ToolResult.Failure("radius 不能为负");
+
+            return CylinderFromTo(V(context), v, info, false);
+        }
+    }
+
+    private sealed class ConstructCylinderFromToTool : ToolBase
+    {
+        public override string Name => "ConstructCylinderFromTo";
+        public override string Description => "沿两点连线建造空心圆柱壳：只保留侧面与两端底面的一层方块。";
+
+        public override JsonObject ParametersSchema => CylinderFromToSchema();
+
+        protected override ToolResult Run(JsonObject args, ToolContext context)
+        {
+            if (!TryInts(args, new[] { "ax", "ay", "az", "bx", "by", "bz", "radius" }, out var v, out var error))
+                return ToolResult.Failure(error);
+            if (!TryBlockInfo(args, out var info, out error)) return ToolResult.Failure(error);
+            if (v[6] < 0) return ToolResult.Failure("radius 不能为负");
+
+            return CylinderFromTo(V(context), v, info, true);
+        }
+    }
+
+    private static ToolResult CylinderFromTo(VoxelToolContext context, int[] v, BlockInfo info, bool hollow)
+    {
+        int ax = v[0], ay = v[1], az = v[2];
+        int bx = v[3], by = v[4], bz = v[5], r = v[6];
+        double dxAxis = bx - ax, dyAxis = by - ay, dzAxis = bz - az;
+        double length2 = dxAxis * dxAxis + dyAxis * dyAxis + dzAxis * dzAxis;
+        double radius2 = (double)r * r;
+
+        Func<int, int, int, bool> inside = (x, y, z) =>
+        {
+            double px = x - ax, py = y - ay, pz = z - az;
+            double t = length2 <= 0 ? 0 : (px * dxAxis + py * dyAxis + pz * dzAxis) / length2;
+            t = Math.Clamp(t, 0, 1);
+            double dx = px - t * dxAxis, dy = py - t * dyAxis, dz = pz - t * dzAxis;
+            return dx * dx + dy * dy + dz * dz <= radius2;
+        };
+
+        return FillShape(context,
+            new Vector3I(Math.Min(ax, bx) - r, Math.Min(ay, by) - r, Math.Min(az, bz) - r),
+            new Vector3I(Math.Max(ax, bx) + r, Math.Max(ay, by) + r, Math.Max(az, bz) + r),
+            inside, hollow, info,
+            hollow ? "ConstructCylinderFromTo" : "FillCylinderFromTo");
+    }
+
     private sealed class GetBlockTool : ToolBase
     {
         public override string Name => "GetBlock";
@@ -587,6 +650,16 @@ public static class BuiltinTools
         ("z", "integer", "底面中心 Z", true),
         ("radius", "integer", "半径（方块数）", true),
         ("height", "integer", "高度（方块数）", true),
+        ("blockInfo", "block", "使用的方块", true));
+
+    private static JsonObject CylinderFromToSchema() => Schema(
+        ("ax", "integer", "轴线端点 A 的 X", true),
+        ("ay", "integer", "轴线端点 A 的 Y", true),
+        ("az", "integer", "轴线端点 A 的 Z", true),
+        ("bx", "integer", "轴线端点 B 的 X", true),
+        ("by", "integer", "轴线端点 B 的 Y", true),
+        ("bz", "integer", "轴线端点 B 的 Z", true),
+        ("radius", "integer", "半径（方块数）", true),
         ("blockInfo", "block", "使用的方块", true));
 
     private static JsonObject Schema(params (string Name, string Type, string Desc, bool Required)[] properties)

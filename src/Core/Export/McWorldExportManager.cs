@@ -416,7 +416,7 @@ public sealed class McWorldExportManager : IExportManager
         w.EndTag(); // root
     }
 
-    // 默认平坦地形：与原版经典超平坦一致（bedrock 1 + dirt 3 + grass 1），从世界底部 y = -64 向上堆叠，顶面 y = -60
+    // 平坦地形固定写默认剖面（基岩 1 + 泥土 3 + 草 1，顶面 -60），与程序内懒生成的地面完全一致
     private static void WriteOverworldGenerator(NbtWriter w, bool blank)
     {
         w.BeginCompound("generator");
@@ -433,10 +433,10 @@ public sealed class McWorldExportManager : IExportManager
         }
         else
         {
-            w.BeginList("layers", NbtWriter.TagType.Compound, 3);
-            WriteFlatLayer(w, "minecraft:bedrock", 1);
-            WriteFlatLayer(w, "minecraft:dirt", 3);
-            WriteFlatLayer(w, "minecraft:grass_block", 1);
+            var layers = McWorldGenerator.DefaultLayers;
+            w.BeginList("layers", NbtWriter.TagType.Compound, layers.Length);
+            foreach (var (id, height) in layers)
+                WriteFlatLayer(w, id, height);
         }
 
         w.EndTag(); // settings

@@ -4,7 +4,7 @@
 - 1 方块 = 1 米（16 像素 = 1 米），工具坐标就是方块坐标。世界高度 y ∈ [-64, 319]。
 - 坐标轴：+x = 东，-x = 西，+z = 南，-z = 北，+y = 上。
 - 默认平坦地图：最上层草方块在 **y = -60**，**y = -59 是第一层空气**；建筑从 y = -59 开始往上放，否则会贴地悬空一格。
-- 地图范围约 112 × 112 格（7 × 7 chunk，x/z 约 -56..55），范围外是纯空气，可以继续建。
+- 地面会随玩家探索自动向外延伸，没有固定边界，可以放心远离出生点建造。
 - 玩家高 1.8 格、宽 0.6 格，可用来判断门窗与净高是否合理。
 
 ## 方块朝向
@@ -43,6 +43,7 @@
 - FillBall(x, y, z, radius, blockId, properties?) / ConstructBall：实心球 / 空心球壳。
 - FillEllipse(x, y, z, radiusX, radiusY, radiusZ, blockId, properties?) / ConstructEllipse：实心椭球 / 空心椭球壳。
 - FillCylinder(x, y, z, radius, height, blockId, properties?) / ConstructCylinder：沿 Y 轴的实心圆柱 / 空心圆柱壳，(x,y,z) 为底面中心。
+- FillCylinderFromTo(ax, ay, az, bx, by, bz, radius, blockId, properties?) / ConstructCylinderFromTo：沿 a→b 连线为轴的圆柱，可做横向或倾斜圆柱。
 - PutLine(x1, y1, z1, x2, y2, z2, blockId, properties?)：两点间的 3D 直线。
 - PutCurve(points, blockId, properties?)：依次连接 points（{x,y,z} 数组，至少 2 个）绘制折线/曲线。
 - ReplaceBlocks(x1, y1, z1, x2, y2, z2, from, blockId, properties?)：区域替换，from 是方块 ID 或 `*`（任意非空气方块）。

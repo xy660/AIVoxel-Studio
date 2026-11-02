@@ -6,6 +6,13 @@ public static class McWorldGenerator
     public const int SurfaceY = McWorld.MinY + 4; // -60：草方块所在层
     private const int ChunkRadius = 3;
 
+    public static readonly (string Id, int Height)[] DefaultLayers =
+    {
+        ("minecraft:bedrock", 1),
+        ("minecraft:dirt", 3),
+        ("minecraft:grass_block", 1),
+    };
+
     public static void GenerateArea(McWorld world, McAssets assets)
     {
         var bedrock = assets.DefaultState("minecraft:bedrock");

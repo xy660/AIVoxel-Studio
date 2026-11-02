@@ -10,6 +10,9 @@ public partial class McWorldRenderer : Node3D, IWorldRenderer
 {
     private const int SectionSize = McSection.Size;
     private const double RebuildBudgetMs = 6.0;
+    private const double GroundCheckInterval = 0.2;
+    private const int GroundRadius = 5;
+    private const int GroundChunksPerTick = 12;
 
     private readonly Dictionary<Vector3I, SectionView> _views = new();
     private readonly HashSet<Vector3I> _dirty = new();
@@ -17,6 +20,8 @@ public partial class McWorldRenderer : Node3D, IWorldRenderer
 
     private McWorld _world;
     private McAssets _assets;
+    private McFlatGround _ground;
+    private double _groundTimer;
     private float _meters = 1f;
     private StandardMaterial3D _opaqueMaterial;
     private StandardMaterial3D _translucentMaterial;
@@ -63,6 +68,7 @@ public partial class McWorldRenderer : Node3D, IWorldRenderer
         _world = world;
         _assets = assets;
         _meters = blockMeters;
+        _ground = McFlatGround.Create(world, assets);
         _world.BlockChanged += OnBlockChanged;
     }
 
@@ -98,6 +104,19 @@ public partial class McWorldRenderer : Node3D, IWorldRenderer
 
     public override void _Process(double delta)
     {
+        // 玩家走到哪就把周围的地面补齐，避免建造范围被初始 7×7 区块限制
+        if (_ground != null && _ground.HasGround)
+        {
+            _groundTimer += delta;
+            if (_groundTimer >= GroundCheckInterval)
+            {
+                _groundTimer = 0;
+                var camera = GetViewport().GetCamera3D();
+                if (camera != null)
+                    _ground.EnsureAround(camera.GlobalPosition, _meters, GroundRadius, GroundChunksPerTick);
+            }
+        }
+
         if (_queue.Count == 0) return;
 
         var watch = Stopwatch.StartNew();

@@ -19,6 +19,8 @@ public static class McShapeTools
         registry.RegisterTool(new ConstructEllipseTool());
         registry.RegisterTool(new FillCylinderTool());
         registry.RegisterTool(new ConstructCylinderTool());
+        registry.RegisterTool(new FillCylinderFromToTool());
+        registry.RegisterTool(new ConstructCylinderFromToTool());
         registry.RegisterTool(new ConstructBoxTool());
     }
 
@@ -412,6 +414,71 @@ public static class McShapeTools
             inside, hollow, hollow ? "ConstructCylinder" : "FillCylinder");
     }
 
+    private sealed class FillCylinderFromToTool : ToolBase
+    {
+        public override string Name => "FillCylinderFromTo";
+        public override string Description =>
+            "沿两点连线填充实心圆柱：a(ax,ay,az) 与 b(bx,by,bz) 为轴线两端，radius 为半径，可做横向或倾斜圆柱。";
+
+        public override JsonObject ParametersSchema => CylinderFromToSchema();
+
+        protected override ToolResult Run(JsonObject args, ToolContext context)
+        {
+            var ctx = M(context);
+            if (!McTools.TryInts(args, new[] { "ax", "ay", "az", "bx", "by", "bz", "radius" }, out var v, out var error))
+                return ToolResult.Failure(error);
+            if (!McTools.TryState(ctx, args, out var state, out var explicitProps, out error))
+                return ToolResult.Failure(error);
+            if (v[6] < 0) return ToolResult.Failure("radius 不能为负");
+
+            return CylinderFromTo(ctx, v, state, explicitProps, false);
+        }
+    }
+
+    private sealed class ConstructCylinderFromToTool : ToolBase
+    {
+        public override string Name => "ConstructCylinderFromTo";
+        public override string Description => "沿两点连线建造空心圆柱壳：只保留侧面与两端底面的一层方块。";
+
+        public override JsonObject ParametersSchema => CylinderFromToSchema();
+
+        protected override ToolResult Run(JsonObject args, ToolContext context)
+        {
+            var ctx = M(context);
+            if (!McTools.TryInts(args, new[] { "ax", "ay", "az", "bx", "by", "bz", "radius" }, out var v, out var error))
+                return ToolResult.Failure(error);
+            if (!McTools.TryState(ctx, args, out var state, out var explicitProps, out error))
+                return ToolResult.Failure(error);
+            if (v[6] < 0) return ToolResult.Failure("radius 不能为负");
+
+            return CylinderFromTo(ctx, v, state, explicitProps, true);
+        }
+    }
+
+    private static ToolResult CylinderFromTo(
+        McToolContext context, int[] v, McBlockState state, Dictionary<string, string> explicitProps, bool hollow)
+    {
+        int ax = v[0], ay = v[1], az = v[2];
+        int bx = v[3], by = v[4], bz = v[5], r = v[6];
+        double dxAxis = bx - ax, dyAxis = by - ay, dzAxis = bz - az;
+        double length2 = dxAxis * dxAxis + dyAxis * dyAxis + dzAxis * dzAxis;
+        double radius2 = (double)r * r;
+
+        Func<int, int, int, bool> inside = (x, y, z) =>
+        {
+            double px = x - ax, py = y - ay, pz = z - az;
+            double t = length2 <= 0 ? 0 : (px * dxAxis + py * dyAxis + pz * dzAxis) / length2;
+            t = Math.Clamp(t, 0, 1);
+            double dx = px - t * dxAxis, dy = py - t * dyAxis, dz = pz - t * dzAxis;
+            return dx * dx + dy * dy + dz * dz <= radius2;
+        };
+
+        return FillShape(context, state, explicitProps,
+            new Vector3I(Math.Min(ax, bx) - r, Math.Min(ay, by) - r, Math.Min(az, bz) - r),
+            new Vector3I(Math.Max(ax, bx) + r, Math.Max(ay, by) + r, Math.Max(az, bz) + r),
+            inside, hollow, hollow ? "ConstructCylinderFromTo" : "FillCylinderFromTo");
+    }
+
     private sealed class ConstructBoxTool : ToolBase
     {
         public override string Name => "ConstructBox";
@@ -472,6 +539,17 @@ public static class McShapeTools
         ("z", "integer", "底面中心 Z", true),
         ("radius", "integer", "半径（方块数）", true),
         ("height", "integer", "高度（方块数）", true),
+        ("blockId", "string", "使用的方块 ID", true),
+        ("properties", "object", "方块属性对象", false));
+
+    private static JsonObject CylinderFromToSchema() => ToolSchema.Schema(
+        ("ax", "integer", "轴线端点 A 的 X", true),
+        ("ay", "integer", "轴线端点 A 的 Y", true),
+        ("az", "integer", "轴线端点 A 的 Z", true),
+        ("bx", "integer", "轴线端点 B 的 X", true),
+        ("by", "integer", "轴线端点 B 的 Y", true),
+        ("bz", "integer", "轴线端点 B 的 Z", true),
+        ("radius", "integer", "半径（方块数）", true),
         ("blockId", "string", "使用的方块 ID", true),
         ("properties", "object", "方块属性对象", false));
 }

@@ -92,7 +92,16 @@ public partial class ChatPanel : CanvasLayer, IUiCallback
 	public override void _Input(InputEvent e)
 	{
 		if (!IsOpen || e is not InputEventKey { Pressed: true, Echo: false } key) return;
-		LogKey("_Input", key);
+
+		// 修饰键 + Enter 在 GUI 之前拦下换行，避免被 TextEdit 内部消费掉
+		if (_input.HasFocus() && IsEnterKey(key) && IsNewlineModifier(key))
+		{
+			_input.InsertTextAtCaret("\n");
+			UpdateInputHeight();
+			GetViewport().SetInputAsHandled();
+			return;
+		}
+
 		if (key.Keycode != Key.V || !key.CtrlPressed || !DisplayServer.ClipboardHasImage()) return;
 
 		var image = DisplayServer.ClipboardGetImage();
@@ -267,24 +276,14 @@ public partial class ChatPanel : CanvasLayer, IUiCallback
 		_input.CustomMinimumSize = new Vector2(0, _inputLineHeight * lines);
 	}
 
-	// Enter 发送，Ctrl+Enter 在光标处换行；多行内容可整段粘贴
+	// Enter 发送，Ctrl/Shift+Enter 在光标处换行；多行内容可整段粘贴
 	private void OnInputGuiInput(InputEvent @event)
 	{
 		if (@event is not InputEventKey key || !key.Pressed || key.Echo) return;
-
-		// 中文输入法或某些布局下 Keycode 可能为空，退回物理键与字符码判断
-		bool enterKey = key.Keycode == Key.Enter || key.Keycode == Key.KpEnter
-			|| key.PhysicalKeycode == Key.Enter || key.PhysicalKeycode == Key.KpEnter;
-		if (!enterKey && key.Keycode == Key.None && key.PhysicalKeycode == Key.None)
-			enterKey = key.Unicode == 10 || key.Unicode == 13;
-		if (!enterKey) return;
-		LogKey("gui_input", key);
+		if (!IsEnterKey(key)) return;
 
 		_input.AcceptEvent();
-		// 事件里的修饰键可能丢失（Alt+Tab 后 Godot 按键状态偶尔不同步），再查一次物理按键
-		bool newline = key.CtrlPressed || key.MetaPressed || key.ShiftPressed
-			|| Input.IsPhysicalKeyPressed(Key.Ctrl);
-		if (newline)
+		if (IsNewlineModifier(key))
 		{
 			_input.InsertTextAtCaret("\n");
 			UpdateInputHeight();
@@ -293,21 +292,19 @@ public partial class ChatPanel : CanvasLayer, IUiCallback
 		if (!_busy) SendCurrent();
 	}
 
-	private static void LogKey(string where, InputEventKey key)
+	private static bool IsEnterKey(InputEventKey key)
 	{
-		try
-		{
-			string path = ProjectSettings.GlobalizePath("user://chat_key_debug.log");
-			System.IO.File.AppendAllText(path,
-				$"{DateTime.Now:HH:mm:ss.fff} {where} code={key.Keycode} phys={key.PhysicalKeycode} " +
-				$"ctrl={key.CtrlPressed} meta={key.MetaPressed} shift={key.ShiftPressed} " +
-				$"pressed={key.Pressed} echo={key.Echo} uni={key.Unicode}\n");
-		}
-		catch (Exception)
-		{
-			// 诊断日志失败不影响输入
-		}
+		if (key.Keycode == Key.Enter || key.Keycode == Key.KpEnter
+			|| key.PhysicalKeycode == Key.Enter || key.PhysicalKeycode == Key.KpEnter)
+			return true;
+		// 中文输入法或某些布局下 Keycode 可能为空，退回字符码判断
+		return key.Keycode == Key.None && key.PhysicalKeycode == Key.None
+			&& (key.Unicode == 10 || key.Unicode == 13);
 	}
+
+	private static bool IsNewlineModifier(InputEventKey key) =>
+		key.CtrlPressed || key.MetaPressed || key.ShiftPressed
+		|| Input.IsPhysicalKeyPressed(Key.Ctrl);
 
 	private async void SendCurrent()
 	{
