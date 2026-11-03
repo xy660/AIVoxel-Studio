@@ -15,8 +15,11 @@ public partial class SettingsDialog : Window
     private LineEdit _extraBody;
     private SpinBox _toolRounds;
     private SpinBox _snapshots;
+    private OptionButton _snapshotSize;
     private LineEdit _mcPath;
     private OptionButton _mcVersion;
+
+    private static readonly int[] SnapshotWidths = { 640, 960, 1280, 1920 };
 
     public event Action Saved;
 
@@ -32,6 +35,9 @@ public partial class SettingsDialog : Window
         _extraBody = GetNode<LineEdit>("Root/Box/Scroll/Grid/ExtraBody");
         _toolRounds = GetNode<SpinBox>("Root/Box/Scroll/Grid/ToolRounds");
         _snapshots = GetNode<SpinBox>("Root/Box/Scroll/Grid/Snapshots");
+        _snapshotSize = GetNode<OptionButton>("Root/Box/Scroll/Grid/SnapshotSize");
+        foreach (int width in SnapshotWidths)
+            _snapshotSize.AddItem($"{width}×{width * 9 / 16}");
         _mcPath = GetNode<LineEdit>("Root/Box/Scroll/Grid/McPathRow/McPath");
         _mcVersion = GetNode<OptionButton>("Root/Box/Scroll/Grid/McVersion");
     }
@@ -54,6 +60,7 @@ public partial class SettingsDialog : Window
         _extraBody.Text = settings.ExtraBodyJson;
         _toolRounds.Value = settings.MaxToolRounds;
         _snapshots.Value = settings.MaxSnapshotsPerRequest;
+        _snapshotSize.Select(SnapshotIndex(settings.SnapshotWidth));
         _mcPath.Text = settings.McAssetsPath;
         RefreshVersions(settings.McVersion);
     }
@@ -70,6 +77,20 @@ public partial class SettingsDialog : Window
     {
         int index = Array.IndexOf(Efforts, effort ?? "");
         return index < 0 ? 3 : index;
+    }
+
+    private static int SnapshotIndex(int width)
+    {
+        int best = 2;
+        int distance = int.MaxValue;
+        for (int i = 0; i < SnapshotWidths.Length; i++)
+        {
+            int diff = Math.Abs(SnapshotWidths[i] - width);
+            if (diff >= distance) continue;
+            distance = diff;
+            best = i;
+        }
+        return best;
     }
 
     private void RefreshVersions(string preferred)
@@ -117,6 +138,7 @@ public partial class SettingsDialog : Window
             _settings.ExtraBodyJson = _extraBody.Text.Trim();
             _settings.MaxToolRounds = (int)_toolRounds.Value;
             _settings.MaxSnapshotsPerRequest = (int)_snapshots.Value;
+            _settings.SnapshotWidth = SnapshotWidths[Mathf.Clamp(_snapshotSize.Selected, 0, SnapshotWidths.Length - 1)];
             _settings.McAssetsPath = McAssetsLocator.NormalizeRoot(_mcPath.Text);
             _settings.McVersion = _CurrentVersion();
             _settings.Persist();

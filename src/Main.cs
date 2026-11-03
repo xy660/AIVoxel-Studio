@@ -192,7 +192,7 @@ public partial class Main : Node3D
     {
         _snapViewport = new SubViewport
         {
-            Size = new Vector2I(640, 360),
+            Size = SnapshotSize(),
             OwnWorld3D = false,
             World3D = GetWorld3D(),
             RenderTargetUpdateMode = SubViewport.UpdateMode.Always,
@@ -201,6 +201,13 @@ public partial class Main : Node3D
         _snapViewport.AddChild(_snapCamera);
         AddChild(_snapViewport);
         _snapCamera.Current = true;
+    }
+
+    private Vector2I SnapshotSize()
+    {
+        int width = Math.Clamp(Settings.SnapshotWidth, 320, 1920);
+        int height = Math.Max(180, (int)Math.Round(width * 9.0 / 16.0));
+        return new Vector2I(width, height);
     }
 
     private void SetupHud()
@@ -282,6 +289,7 @@ public partial class Main : Node3D
             _llm.Config = BuildLlmConfig();
             ChatEngine.MaxToolRounds = Settings.MaxToolRounds;
             ChatEngine.MaxSnapshotsPerRequest = Settings.MaxSnapshotsPerRequest;
+            if (_snapViewport != null) _snapViewport.Size = SnapshotSize();
         };
         ChatUi.OpenSettings = () => SettingsUi.Open();
     }

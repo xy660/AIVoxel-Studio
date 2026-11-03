@@ -37,6 +37,7 @@ public sealed class ChatStore
 
 		try
 		{
+			image = FitUploadSize(image);
 			Directory.CreateDirectory(AttachmentsDir);
 			string name = $"{DateTime.UtcNow:yyyyMMdd-HHmmss}-{Random.Shared.Next(1000, 9999)}.png";
 			File.WriteAllBytes(Path.Combine(AttachmentsDir, name), image.SavePngToBuffer());
@@ -47,6 +48,21 @@ public sealed class ChatStore
 			GD.PushWarning($"Failed to save attachment: {ex.Message}");
 			return null;
 		}
+	}
+
+	// 上传给模型的图片最大 1920×1080：小于等于则原样保存，超出则等比缩小
+	private static Image FitUploadSize(Image image)
+	{
+		const int maxWidth = 1920;
+		const int maxHeight = 1080;
+		int width = image.GetWidth();
+		int height = image.GetHeight();
+		if (width <= maxWidth && height <= maxHeight) return image;
+
+		float scale = Math.Min(maxWidth / (float)width, maxHeight / (float)height);
+		image.Resize(Math.Max(1, (int)(width * scale)), Math.Max(1, (int)(height * scale)),
+			Image.Interpolation.Bilinear);
+		return image;
 	}
 
 	public Image LoadAttachment(string name)

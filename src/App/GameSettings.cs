@@ -17,6 +17,8 @@ public sealed class GameSettings
     public string ExtraBodyJson { get; set; } = "";
     public int MaxToolRounds { get; set; } = 30;
     public int MaxSnapshotsPerRequest { get; set; } = 5;
+    /// <summary>快照宽度（像素，16:9 按此换算高度），可选 640 / 960 / 1280 / 1920。</summary>
+    public int SnapshotWidth { get; set; } = 1280;
     public string SaveName { get; set; } = "world";
     public BuildKind BuildKind { get; set; } = BuildKind.Voxel;
     public bool GenerateGround { get; set; } = true;

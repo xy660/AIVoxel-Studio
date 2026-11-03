@@ -342,23 +342,10 @@ public partial class ChatPanel : CanvasLayer, IUiCallback
 			return;
 		}
 
-		string name = _engine?.SaveAttachment(NormalizeImage(image));
+		string name = _engine?.SaveAttachment(image);
 		if (string.IsNullOrEmpty(name)) return;
 		_pendingImages.Add(name);
 		RefreshPendingImages();
-	}
-
-	private static Image NormalizeImage(Image image)
-	{
-		const int maxWidth = 1280;
-		const int maxHeight = 720;
-		int width = image.GetWidth();
-		int height = image.GetHeight();
-		if (width <= maxWidth && height <= maxHeight) return image;
-
-		float scale = Math.Min(maxWidth / (float)width, maxHeight / (float)height);
-		image.Resize(Math.Max(1, (int)(width * scale)), Math.Max(1, (int)(height * scale)), Image.Interpolation.Bilinear);
-		return image;
 	}
 
 	private void RefreshPendingImages()
